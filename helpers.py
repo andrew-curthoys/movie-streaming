@@ -73,7 +73,7 @@ class Crawler:
         movie_link.click()
         
         # Get all the streaming data for each movie
-        streaming_sites_table_header = self.return_element('xpath', "//*[contains(text(), 'Where to Watch')]")
+        streaming_sites_table_header = self.return_element('xpath', "//h2[contains(text(), 'Where to Watch')]")
         streaming_sites_table_container = streaming_sites_table_header.find_element_by_xpath("./../../..")
         streaming_sites_table = streaming_sites_table_container.find_element_by_tag_name('nav')
 
