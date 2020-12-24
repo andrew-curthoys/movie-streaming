@@ -49,6 +49,9 @@ class Crawler:
         self.driver.quit()
 
     def get_movie_data(self, movie):
+        # Go to site
+        self.driver.get(self.ratings_site)
+
         # Initialize list for streaming site data by movie
         streaming_data_by_movie = []
 
