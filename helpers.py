@@ -33,7 +33,9 @@ class Crawler:
 
             # Get data for the given movie
             try:
-                streaming_sites_by_movie = self.get_movie_data(movie)
+                streaming_data_by_movie = self.get_movie_data(movie)
+                if not streaming_data_by_movie:
+                    streaming_data_by_movie = [["No streaming sites currently available", "Better luck next time"]]
             except Exception as e:
                 error_data = self.ErrorData(movie, str(e))
                 self.error_list.append(error_data)
@@ -41,7 +43,7 @@ class Crawler:
                 continue
             
             # Add move streaming data to dictionary for the given movie
-            movie_info[movie] = streaming_sites_by_movie
+            movie_info[movie] = streaming_data_by_movie
         
             # Add movie data to the full list
             self.all_movies.append(movie_info)
