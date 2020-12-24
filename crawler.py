@@ -22,3 +22,4 @@ logging.basicConfig(
 if __name__ == "__main__":
     crawler = Crawler(start_index=start_index, end_index=end_index)
     crawler.get_all_movie_data()
+    crawler.write_data()
