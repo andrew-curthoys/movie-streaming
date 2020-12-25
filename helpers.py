@@ -1,5 +1,5 @@
-import re, time, logging, json
-from collections import namedtuple
+import re, time, logging, json, csv
+from collections import namedtuple, defaultdict
 from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException, StaleElementReferenceException
 from selenium.webdriver.support.ui import WebDriverWait
@@ -14,6 +14,9 @@ class Crawler:
         self.default_timeout = 10
         self.wait = WebDriverWait(self.driver, self.default_timeout)
         self.movie_list = movie_list
+        self.all_streaming_sites = defaultdict(int)
+        self.all_streaming_sites["Movie"] = 151
+        self.all_streaming_sites["None"] = 150
         self.all_movies = []
         self.error_list = []
         self.start_index = kwargs.get('start_index')
@@ -34,19 +37,19 @@ class Crawler:
             # Get data for the given movie
             try:
                 streaming_data_by_movie = self.get_movie_data(movie)
-                if not streaming_data_by_movie:
-                    streaming_data_by_movie = [["No streaming sites currently available", "Better luck next time"]]
+
+                # Check if there were no movies found
+                if len(streaming_data_by_movie) == 1:
+                    streaming_data_by_movie["None"] = "N/A"
+
             except Exception as e:
                 error_data = self.ErrorData(movie, str(e))
                 self.error_list.append(error_data)
                 logging.exception(f'{str(e)} for "{movie}"')           
                 continue
-            
-            # Add move streaming data to dictionary for the given movie
-            movie_info[movie] = streaming_data_by_movie
         
             # Add movie data to the full list
-            self.all_movies.append(movie_info)
+            self.all_movies.append(streaming_data_by_movie)
         
         self.driver.quit()
 
@@ -55,7 +58,7 @@ class Crawler:
         self.driver.get(self.ratings_site)
 
         # Initialize list for streaming site data by movie
-        streaming_data_by_movie = []
+        streaming_data_by_movie = {"Movie": movie}
 
         # Search for movie then click on the correct movie
         logging.info(f'Searching for "{movie}"')
@@ -84,9 +87,9 @@ class Crawler:
                 streaming_price_data = streaming_site.find_elements_by_tag_name('span')
                 streaming_site = streaming_price_data[0].get_attribute('innerHTML')
                 streaming_site_price = streaming_price_data[1].get_attribute('innerHTML')
+                self.all_streaming_sites[streaming_site] += 1
                 streaming_price = self.StreamingPrice(streaming_site, streaming_site_price)
-                streaming_data_by_movie.append(streaming_price)
-
+                streaming_data_by_movie[streaming_site] = streaming_site_price
             except Exception as e:
                 error_data = self.ErrorData(movie, str(e))
                 self.error_list.append(error_data)
@@ -96,11 +99,16 @@ class Crawler:
         return streaming_data_by_movie
 
     def write_data(self):
-        open("all_movies.txt", "w").close()
-        with open("all_movies.txt", "a") as f:
+        # open("all_movies.txt", "w").close()
+        with open("all_movies.txt", "w") as f:
+            sorted_sites = sorted(self.all_streaming_sites, key=self.all_streaming_sites.get, reverse=True)
+            header = [key for key in sorted_sites]
+            writer = csv.DictWriter(f, fieldnames=header)
+            writer.writeheader()
+
             for movie in self.all_movies:
-                f.write(json.dumps(movie))
-                f.write('\n')
+                writer.writerow(movie)
+        
         open("errors.txt", "w").close()
         with open("errors.txt", "a") as f:
             for error in self.error_list:
