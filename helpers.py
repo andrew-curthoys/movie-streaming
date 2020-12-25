@@ -100,7 +100,7 @@ class Crawler:
 
     def write_data(self):
         # open("all_movies.txt", "w").close()
-        with open("all_movies.txt", "w") as f:
+        with open("all_movies.csv", "w") as f:
             sorted_sites = sorted(self.all_streaming_sites, key=self.all_streaming_sites.get, reverse=True)
             header = [key for key in sorted_sites]
             writer = csv.DictWriter(f, fieldnames=header)
