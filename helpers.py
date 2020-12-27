@@ -15,8 +15,8 @@ class Crawler:
         self.wait = WebDriverWait(self.driver, self.default_timeout)
         self.movie_list = movie_list
         self.all_streaming_sites = defaultdict(int)
-        self.all_streaming_sites["Movie"] = 151
-        self.all_streaming_sites["None"] = 150
+        self.all_streaming_sites["Movie"] = len(movie_list) + 1
+        self.all_streaming_sites["None"] = len(movie_list)
         self.all_movies = []
         self.error_list = []
         self.start_index = kwargs.get('start_index')
