@@ -114,30 +114,3 @@ class Crawler:
             for error in self.error_list:
                 f.write(json.dumps(error))
                 f.write('\n')
-
-    def movie_search(self, movie_name):
-        movie_xpath_name = movie_name.lower().replace(' ', '_')
-        movie_xpath_name = re.sub(r'[^\w]', '', movie_xpath_name)
-        movie_xpath_name = movie_xpath_name.lower().replace('_', '-')
-        self.movie_xpath = f"//a[contains(@href, '{movie_xpath_name}')]"
-        self.driver.get('https://reelgood.com')
-        searchbar = self.return_element('id', 'searchbox')
-        searchbar.clear()
-        searchbar.send_keys(movie_name)
-        searchbar.submit()
-
-    def return_element(self, element_type, element_name, **kwargs):
-        timeout = kwargs.get('timeout')
-        if timeout:
-            elem = WebDriverWait(self.driver, timeout).until(ec.presence_of_element_located((search_type[element_type], element_name)))
-        else:
-            elem = WebDriverWait(self.driver, self.default_timeout).until(ec.presence_of_element_located((search_type[element_type], element_name)))
-        return elem
-
-    def return_elements(self, element_type, element_name, **kwargs):
-        timeout = kwargs.get('timeout')
-        if timeout:
-            elem = WebDriverWait(self.driver, timeout).until(ec.presence_of_element_located((search_type[element_type], element_name)))
-        else:
-            elem = WebDriverWait(self.driver, self.default_timeout).until(ec.presence_of_element_located((search_type[element_type], element_name)))
-        return elem
