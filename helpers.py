@@ -97,6 +97,22 @@ class Crawler:
                 continue
 
         return streaming_data_by_movie
+        
+    def return_element(self, element_type, element_name, **kwargs):
+        timeout = kwargs.get('timeout')
+        if timeout:
+            elem = WebDriverWait(self.driver, timeout).until(ec.presence_of_element_located((search_type[element_type], element_name)))
+        else:
+            elem = WebDriverWait(self.driver, self.default_timeout).until(ec.presence_of_element_located((search_type[element_type], element_name)))
+        return elem
+
+    def return_elements(self, element_type, element_name, **kwargs):
+        timeout = kwargs.get('timeout')
+        if timeout:
+            elem = WebDriverWait(self.driver, timeout).until(ec.presence_of_element_located((search_type[element_type], element_name)))
+        else:
+            elem = WebDriverWait(self.driver, self.default_timeout).until(ec.presence_of_element_located((search_type[element_type], element_name)))
+        return elem
 
     def write_data(self):
         # open("all_movies.txt", "w").close()
